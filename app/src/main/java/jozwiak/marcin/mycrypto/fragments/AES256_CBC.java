@@ -1,14 +1,23 @@
 package jozwiak.marcin.mycrypto.fragments;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.Socket;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by Marcin on 2015-06-03.
@@ -90,5 +99,27 @@ public class AES256_CBC {
             cis.close();
             fis.close();
         }
+    }
+
+    public static void decryptOnServer(File inputFile) throws Exception {
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+
+//        SSLSocketFactory ssf = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        SocketFactory ssf = SocketFactory.getDefault();
+        Socket s = ssf.createSocket("192.168.1.6", 8080);
+
+        byte [] mybytearray  = new byte [(int)inputFile.length()];
+        fis = new FileInputStream(inputFile);
+        bis = new BufferedInputStream(fis);
+        bis.read(mybytearray,0,mybytearray.length);
+        os = s.getOutputStream();
+        os.write(mybytearray, 0, mybytearray.length);
+        os.flush();
+        bis.close();
+        os.close();
+        s.close();
+
     }
 }
